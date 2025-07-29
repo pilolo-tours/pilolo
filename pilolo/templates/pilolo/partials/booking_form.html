@@ -1,0 +1,75 @@
+<!-- templates/tours/partials/booking_form.html -->
+<div class="bg-white rounded-xl shadow-2xl max-w-md mx-auto p-6 relative">
+    <button onclick="document.getElementById('booking-modal').classList.add('hidden'); document.getElementById('booking-modal').classList.remove('flex');" 
+            class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl">
+        ×
+    </button>
+    
+    <h3 class="text-2xl font-bold text-gray-900 mb-6">Book Your Tour</h3>
+    
+    <div class="mb-4 p-4 bg-ghana-green bg-opacity-10 rounded-lg">
+        <p class="font-semibold text-ghana-green">{{ schedule.tour.name }}</p>
+        <p class="text-sm text-gray-600">{{ schedule.get_day_display }} • {{ schedule.start_time }} - {{ schedule.end_time }}</p>
+        <p class="text-lg font-bold text-ghana-green mt-2">GHS {{ schedule.tour.price }} per person</p>
+    </div>
+
+    <form hx-post="{% url 'create_booking' %}" 
+          hx-target="#booking-modal" 
+          hx-swap="innerHTML"
+          class="space-y-4">
+        {% csrf_token %}
+        
+        {{ form.schedule }}
+        
+        <div>
+            <label for="{{ form.tour_date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                Tour Date
+            </label>
+            {{ form.tour_date }}
+            {% if form.tour_date.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ form.tour_date.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            <label for="{{ form.participants.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                Number of Participants
+            </label>
+            {{ form.participants }}
+            {% if form.participants.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ form.participants.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            <label for="{{ form.phone.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                Phone Number
+            </label>
+            {{ form.phone }}
+            {% if form.phone.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ form.phone.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            <label for="{{ form.special_requirements.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                Special Requirements (Optional)
+            </label>
+            {{ form.special_requirements }}
+            {% if form.special_requirements.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ form.special_requirements.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="flex space-x-4 pt-4">
+            <button type="button" 
+                    onclick="document.getElementById('booking-modal').classList.add('hidden'); document.getElementById('booking-modal').classList.remove('flex');"
+                    class="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors">
+                Cancel
+            </button>
+            <button type="submit" class="flex-1 btn-primary">
+                Confirm Booking
+            </button>
+        </div>
+    </form>
+</div>

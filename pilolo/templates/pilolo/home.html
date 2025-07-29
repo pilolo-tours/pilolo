@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!-- Hero Section -->
+<section class="relative text-white">
+    <div class="absolute inset-0 bg-black opacity-20"></div>
+    <video autoplay muted loop playsinline class="absolute top-0 left-0 w-full h-full object-cover z-0">
+      <source src="{% static 'videos/pilolo_2.mp4' %}" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    <div class="relative max-w-7xl mx-auto px-4 py-20">
+        <div class="text-center">
+            <h1 class="text-5xl font-bold mb-6">Discover Ghana by Bicycle</h1>
+            <p class="text-xl mb-8 max-w-3xl mx-auto">
+                Experience Ghana's cities as they truly are—raw, real, and unfiltered. 
+                Join our intimate cycling adventures through Accra's power corridors and creative quarters.
+            </p>
+            <div class="flex justify-center space-x-4">
+                <a href="#tours" class="btn-secondary">View Tours</a>
+                <button class="bg-transparent border-2 border-white text-white px-6 py-2 rounded-lg hover:bg-white hover:text-ghana-green transition-all duration-200 font-medium">
+                    Learn More
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Why Choose Pilolo Tours?</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">Founded on the principle that authentic discovery requires both curiosity and connection</p>
+        </div>
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="text-center p-6">
+                <div class="w-16 h-16 bg-ghana-green rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-2xl">🚴‍♂️</span>
+                </div>
+                <h3 class="text-xl font-semibold mb-3">Sustainable Tourism</h3>
+                <p class="text-gray-600">Eco-friendly bicycle exploration that benefits local communities while minimizing environmental impact.</p>
+            </div>
+            <div class="text-center p-6">
+                <div class="w-16 h-16 bg-ghana-gold rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-2xl">👥</span>
+                </div>
+                <h3 class="text-xl font-semibold mb-3">Small Groups</h3>
+                <p class="text-gray-600">Maximum 8 participants ensuring personalized attention and meaningful cultural exchange.</p>
+            </div>
+            <div class="text-center p-6">
+                <div class="w-16 h-16 bg-ghana-red rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-2xl">🏛️</span>
+                </div>
+                <h3 class="text-xl font-semibold mb-3">Expert Guides</h3>
+                <p class="text-gray-600">Professional guides with extensive knowledge of local history, architecture, and culture.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Tours Section -->
+<section id="tours" class="py-16 bg-gray-50">
+    <div class="px-4 lg:px-24">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Our Tours</h2>
+            <p class="text-gray-600">Meticulously crafted bicycle experiences through Ghana's urban destinations</p>
+        </div>
+        
+        <div class="{% if tours|length == 1 %}grid grid-cols-1{% else %}grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1{% endif %} gap-8">
+        {% for tour in tours %}
+            <a href="{% url 'tour_detail' tour.id %}" class="relative group h-96 w-full overflow-hidden shadow-lg transition-all duration-300">
+            {% if tour.image %}
+                <img src="{{ tour.image }}" alt="{{ tour.name }}" class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition duration-500">
+            {% else %}
+                <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-green-800 to-green-500 flex items-center justify-center">
+                <span class="text-7xl text-white">🚴‍♂️</span>
+                </div>
+            {% endif %}
+
+            <!-- Overlay Gradient -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent group-hover:from-black/90 transition duration-500"></div>
+
+            <!-- Content Overlay -->
+            <div class="relative z-10 p-6 h-full flex flex-col justify-end">
+                <h3 class="text-2xl font-bold text-white group-hover:text-green-400 transition mb-2 uppercase tracking-wide">{{ tour.name }}</h3>
+                <p class="text-sm text-white group-hover:text-gray-200 mb-4 line-clamp-3">
+                {{ tour.description|truncatewords:30 }}
+                </p>
+                <div class="flex items-center justify-between text-white text-sm">
+                <div>
+                    <span class="mr-4">⏱️ {{ tour.duration }}</span>
+                    <span>👥 {{ tour.max_participants }} max</span>
+                </div>
+                <div class="text-lg font-bold text-green-400">GHS {{ tour.price }}</div>
+                </div>
+            </div>
+            </a>
+        {% empty %}
+            <div class="col-span-full text-center py-12">
+            <p class="text-gray-500 text-lg">No tours available at the moment.</p>
+            </div>
+        {% endfor %}
+        </div>
+
+    </div>
+</section>
+{% endblock %}

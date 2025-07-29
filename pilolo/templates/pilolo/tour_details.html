@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ tour.name }} - Pilolo Tours{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-8">
+    <!-- Tour Header -->
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+        {% if tour.image %}
+            <img src="{{ tour.image }}" alt="{{ tour.name }}" class="w-full h-80 object-cover">
+        {% else %}
+            <div class="w-full h-80 bg-gradient-to-r from-ghana-green to-green-500 flex items-center justify-center">
+                <span class="text-8xl">🚴‍♂️</span>
+            </div>
+        {% endif %}
+        
+        <div class="p-8">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ tour.name }}</h1>
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center space-x-6 text-gray-600">
+                    <span class="flex items-center"><span class="mr-2">⏱️</span>{{ tour.duration }}</span>
+                    <span class="flex items-center"><span class="mr-2">👥</span>Max {{ tour.max_participants }} people</span>
+                    <span class="flex items-center"><span class="mr-2">📍</span>{{ tour.meeting_point }}</span>
+                </div>
+                <div class="text-3xl font-bold text-ghana-green">GHS {{ tour.price }}</div>
+            </div>
+            <p class="text-gray-700 text-lg leading-relaxed">{{ tour.description|linebreaks }}</p>
+        </div>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-8">
+        <!-- Tour Information -->
+        <div class="lg:col-span-2 space-y-8">
+            <!-- Highlights -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">Highlights</h2>
+                <div class="prose text-gray-700">
+                    {{ tour.highlights|linebreaks }}
+                </div>
+            </div>
+
+            <!-- What's Included -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">What's Included</h2>
+                <div class="prose text-gray-700">
+                    {{ tour.what_included|linebreaks }}
+                </div>
+            </div>
+
+            <!-- What to Bring -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">What to Bring</h2>
+                <div class="prose text-gray-700">
+                    {{ tour.what_to_bring|linebreaks }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Section -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-xl shadow-lg p-6 sticky top-24">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Book Your Adventure</h3>
+                
+                <div class="space-y-4 mb-6">
+                    {% for schedule in schedules %}
+                        <div class="border border-gray-200 rounded-lg p-4 hover:border-ghana-green transition-colors">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="font-semibold text-gray-900">{{ schedule.get_day_display }}</p>
+                                    <p class="text-gray-600">{{ schedule.start_time }} - {{ schedule.end_time }}</p>
+                                </div>
+                                <button 
+                                    hx-post="{% url 'booking_form' %}"
+                                    hx-vals='{"schedule_id": "{{ schedule.id }}"}'
+                                    hx-target="#booking-modal"
+                                    hx-swap="innerHTML"
+                                    class="btn-primary text-sm">
+                                    Book Now
+                                </button>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p class="text-gray-500">No schedules available at the moment.</p>
+                    {% endfor %}
+                </div>
+
+                <div class="text-sm text-gray-500">
+                    <p class="mb-2">✅ Free cancellation up to 24 hours before</p>
+                    <p class="mb-2">✅ Instant confirmation</p>
+                    <p>✅ Small group experience</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Booking Modal -->
+<div id="booking-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+    <div id="modal-loading-spinner" class="text-white flex flex-col items-center gap-4">
+        <svg class="animate-spin h-10 w-10 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+        </svg>
+        <p class="text-sm uppercase tracking-wide">Loading booking form...</p>
+    </div>
+</div>
+
+
+<script>
+   document.addEventListener('htmx:configRequest', function(e) {
+        // Show modal and spinner before HTMX request is sent
+        const modal = document.getElementById('booking-modal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.getElementById('modal-loading-spinner').style.display = 'flex';
+        }
+    });
+
+    document.addEventListener('htmx:afterSwap', function(e) {
+        if (e.detail.target.id === 'booking-modal') {
+            // Hide spinner after content is swapped in
+            const spinner = document.getElementById('modal-loading-spinner');
+            if (spinner) spinner.style.display = 'none';
+        }
+    });
+
+    document.getElementById('booking-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.add('hidden');
+            this.classList.remove('flex');
+            const spinner = document.getElementById('modal-loading-spinner');
+            if (spinner) spinner.style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}

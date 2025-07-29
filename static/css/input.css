@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+@theme {
+
+    --color-ghana-red: #CE1126;
+    --color-ghana-gold: #FCD116;
+    --color-ghana-green: #006B3F;
+                      
+}
+    
+.form-input {
+    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-ghana-green focus:border-transparent transition-all;
+}
+.btn-primary {
+    @apply bg-ghana-green text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-all duration-200 font-medium;
+}
+.btn-secondary {
+    @apply bg-ghana-gold text-ghana-green px-6 py-2 rounded-lg hover:bg-yellow-300 transition-all duration-200 font-medium;
+}
+    
