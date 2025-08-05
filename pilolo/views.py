@@ -88,7 +88,7 @@ def booking_participants(request):
     participants = []
 
 
-
+    print(participant_count)
     # Handle case with additional participants
     if request.method == 'POST':
         if participant_count > 0:
@@ -323,6 +323,7 @@ def update_participant_count(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         count = data.get('count', 0)
+        print("COUNT:", count)
         request.session['booking']['participants'] = count
         request.session.modified = True
 

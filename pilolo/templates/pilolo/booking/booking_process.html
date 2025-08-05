@@ -220,6 +220,7 @@
 
     container.appendChild(newCard);
     participantWithBookerCount++;
+    participantCount++; // Increase the count of participants
 
     // Update the request session
     fetch("{% url 'update_participant_count' %}", {
@@ -251,7 +252,7 @@
       setTimeout(() => {
         card.remove();
         participantWithBookerCount--;
-
+        participantCount--; // Decrease the count of participants
         // update the request session
         fetch("{% url 'update_participant_count' %}", {
           method: 'POST',
