@@ -301,6 +301,15 @@ def my_bookings(request):
     paginator = Paginator(bookings_list, 10)  # Show 10 bookings per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+
+    if request.headers.get('HX-Request'):
+        # Return just the bookings list partial for HTMX requests
+        return render(request, 'pilolo/partials/_bookings_list.html', {
+            'bookings': page_obj,
+            'is_paginated': page_obj.has_other_pages(),
+            'page_obj': page_obj,
+            'current_status': status
+        })
     
     return render(request, 'pilolo/my_bookings.html', {
         'page_obj': page_obj,
