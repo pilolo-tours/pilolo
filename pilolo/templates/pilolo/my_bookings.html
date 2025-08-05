@@ -113,9 +113,11 @@ document.addEventListener('DOMContentLoaded', function() {
       this.classList.add('active');
       
       // Show loading indicator
-      loadingIndicator.classList.remove('hidden');
-      loadingIndicator.classList.add('flex');
-
+      contentContainer.innerHTML = `
+        <div class="flex justify-center items-center h-64">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+        </div>
+      `;
 
       // Get the URL from the clicked tab
       const url = this.getAttribute('href');
@@ -125,9 +127,8 @@ document.addEventListener('DOMContentLoaded', function() {
         target: '#bookings-content',
         swap: 'innerHTML',
         onSuccess: function() {
-          // Hide loading indicator
+          // Hide loading indicator after content is loaded
           loadingIndicator.classList.add('hidden');
-          loadingIndicator.classList.remove('flex');
 
           // Update URL without full page reload
           window.history.pushState({}, '', url);
