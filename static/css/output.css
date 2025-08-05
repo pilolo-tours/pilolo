@@ -538,6 +538,9 @@
   .h-screen {
     height: 100vh;
   }
+  .min-h-64 {
+    min-height: calc(var(--spacing) * 64);
+  }
   .min-h-\[calc\(100vh-200px\)\] {
     min-height: calc(100vh - 200px);
   }
