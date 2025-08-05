@@ -165,7 +165,7 @@
   }
 
   function addParticipant() {
-    if (participantCount >= maxSlots) return;
+    if (participantWithBookerCount >= maxSlots) return;
 
     const container = document.getElementById("participant-section");
     // Get the current highest participant number from existing cards
@@ -219,7 +219,7 @@
     `;
 
     container.appendChild(newCard);
-    participantCount++;
+    participantWithBookerCount++;
 
     // Update the request session
     fetch("{% url 'update_participant_count' %}", {
@@ -250,7 +250,7 @@
       card.classList.add('opacity-0', 'translate-x-4');
       setTimeout(() => {
         card.remove();
-        participantCount--;
+        participantWithBookerCount--;
 
         // update the request session
         fetch("{% url 'update_participant_count' %}", {
