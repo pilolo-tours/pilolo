@@ -1,0 +1,429 @@
+{% extends 'base.html' %}
+{% load utils %}
+
+{% block title %} {{step| capfirst }} {% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+  <div class="bg-white shadow rounded-lg overflow-hidden">
+    <div class="bg-green-600 px-6 py-4">
+      <h1 class="text-2xl font-bold text-white">Booking Process</h1>
+      <p class="text-green-100 mt-1">
+        Booking for {{ tour.name }} on {{ schedule.date|date:"F j, Y" }}
+      </p>
+    </div>
+
+    <div class="px-6 py-5">
+      <div class="mb-8">
+        <div class="flex items-center">
+          <div class="flex-1 border-t-2
+          {% if step == 'participants' or step == 'payment' or step == 'confirmation' %}border-green-500
+            {% else %}border-gray-300
+          {% endif %}">
+            <span class="sr-only">Step 1: Participants</span>
+          </div>
+          <div class="mx-4">
+            <span class="flex items-center justify-center w-8 h-8 {% if step == 'participants' or step == 'payment' or step == 'confirmation'%}bg-green-500 text-white{% else %}bg-gray-300 text-gray-600{% endif %} rounded-full font-medium">
+              1
+            </span>
+          </div>
+          <div class="flex-1 border-t-2 {% if step == 'payment' or step == 'confirmation' %}border-green-500{% else %}border-gray-300{% endif %}"></div>
+          <div class="mx-4">
+            <span class="flex items-center justify-center w-8 h-8 {% if step == 'payment' or step == 'confirmation' %}bg-green-500 text-white{% else %}bg-gray-300 text-gray-600{% endif %} rounded-full font-medium">
+              2
+            </span>
+          </div>
+          <div class="flex-1 border-t-2 {% if step == 'confirmation' %}border-green-500{% else %}border-gray-300{% endif %}"></div>
+        </div>
+        <div class="flex justify-between text-sm mt-2">
+          <span class="{% if step == 'participants' %}text-green-600 font-medium{% else %}text-gray-500{% endif %}">Participants</span>
+          <span class="{% if step == 'payment' %}text-green-600 font-medium{% else %}text-gray-500{% endif %}">Payment</span>
+          <span class="{% if step == 'confirmation' %}text-green-600 font-medium{% else %}text-gray-500{% endif %}">Confirmation</span>
+        </div>
+      </div>
+
+      <div id="booking-content">
+        {% if step == 'participants' %}
+          {% include 'pilolo/partials/participants.html' %}
+
+
+        {% elif step == 'payment' %}
+          <div class="space-y-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Payment Information</h2>
+
+            <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-6">
+              <h3 class="text-lg font-semibold text-gray-800 mb-3">Booking Summary</h3>
+              <div class="space-y-2">
+                <p class="text-gray-700"><strong>Tour:</strong> {{ tour.name }}</p>
+                <p class="text-gray-700"><strong>Date:</strong> {{ schedule.date|date:"F j, Y" }}</p>
+                <p class="text-gray-700"><strong>Time:</strong> {{ schedule.start_time|time:"H:i" }} - {{ schedule.end_time|time:"H:i" }}</p>
+                <p class="text-gray-700"><strong>Participants:</strong> 
+                  {% if participant_count > 0 %}
+                    {{ participant_count }}
+                  {% else %}
+                    0 (just you)
+                  {% endif %}
+                </p>
+                <p class="text-gray-700"><strong>Total Price:</strong> GHS {{ total_price }}</p>
+              </div>
+            </div>
+
+            <form id="payment-form" onsubmit="payWithPaystack(event)">
+              {% csrf_token %}
+              <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+                <div class="flex">
+                  <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <div class="ml-3">
+                    <p class="text-sm text-blue-700">
+                      You will be redirected to Paystack to complete your payment securely.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
+                <input type="email" name="email" required disabled
+                       placeholder="Your email for payment receipt"
+                       class="form-input w-full disabled:bg-gray-100 cursor-not-allowed" value="{{ request.user.email }}">
+                       <p class="text-sm text-gray-500 mt-1">We'll send a confirmation email to this address.</p>
+              </div>
+
+              <div class="mt-6 mb-4">
+                <label class="flex items-start">
+                  <div class="flex items-center h-5">
+                    <input type="checkbox" name="terms" required class="focus:ring-green-500 h-4 w-4 text-green-600 border-gray-300 rounded">
+                  </div>
+                  <div class="ml-3 text-sm">
+                    <p class="text-gray-500">I agree to the <a href="#" class="text-green-600 hover:text-green-500">Terms and Conditions</a> and <a href="#" class="text-green-600 hover:text-green-500">Privacy Policy</a></p>
+                  </div>
+                </label>
+              </div>
+
+              <div class="flex justify-between pt-6 border-t border-gray-200">
+                <a href="{{ request.META.HTTP_REFERER|default:'/' }}"
+                        class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                  ← Back
+                </a>
+                <button type="submit"
+                        class="btn-primary inline-flex items-center px-4 py-2">
+                  Pay with Paystack →
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+
+
+        {% elif step == 'confirmation' %}
+         
+        
+          {% include 'pilolo/partials/confirmation.html' %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{# Load Paystack V2 inline script globally before your custom script #}
+<script src="https://js.paystack.co/v2/inline.js"></script>
+
+<script>
+  // Participant management functions
+  // Ensure participantCount and maxSlots are numbers
+  let participantWithBookerCount = parseInt("{{ participants_with_booker }}");
+  const maxSlots = parseInt("{{ remaining_slots }}");
+  let participantCount = parseInt("{{ participant_count }}") || 0; // Default to 0 if not set
+
+  let nextParticipantId = participantCount + 1; // Start numbering for new participants
+
+  function updateBookingInfo() {
+    // Update total people count (booker + participants)
+    document.getElementById('total-people').textContent = participantWithBookerCount;
+    document.getElementById('total-people-label').textContent = participantWithBookerCount === 1 ? 'person' : 'people';
+    document.getElementById('include-yourself').textContent = participantWithBookerCount > 1 ? ' (including yourself)' : '(just you)';
+
+    // Update spots left
+    const spotsLeft = maxSlots - participantWithBookerCount;
+    document.getElementById('spots-left').textContent = spotsLeft;
+    document.getElementById('slots-left').textContent = `(${spotsLeft} spots left)`;
+
+    // Hide add button if no spots left
+    const addParticipantContainer = document.getElementById('add-participant-container');
+    if (addParticipantContainer) { // Check if the element exists (only present on participants step)
+      if (spotsLeft <= 0) {
+        addParticipantContainer.classList.add('hidden');
+      } else {
+        addParticipantContainer.classList.remove('hidden');
+      }
+    }
+  }
+
+  function addParticipant() {
+    if (participantCount >= maxSlots) return;
+
+    const container = document.getElementById("participant-section");
+    // Get the current highest participant number from existing cards
+    const existingCards = document.querySelectorAll('.participant-card');
+    let highestExistingId = 0;
+    existingCards.forEach(card => {
+      const inputName = card.querySelector('input[name^="participant_"]')?.name;
+      if (inputName) {
+        const idMatch = inputName.match(/participant_(\d+)_/);
+        if (idMatch && parseInt(idMatch[1]) > highestExistingId) {
+          highestExistingId = parseInt(idMatch[1]);
+        }
+      }
+    });
+    // Ensure newId is always unique and increasing
+    const newId = Math.max(nextParticipantId, highestExistingId + 1);
+    nextParticipantId = newId + 1;
+
+    const newCard = document.createElement("div");
+    newCard.className = "participant-card bg-gray-50 p-5 rounded-lg border border-gray-200 transition-all duration-200 hover:border-green-300";
+    newCard.innerHTML = `
+      <div class="flex justify-between items-center mb-3">
+        <h2 class="text-lg font-semibold text-gray-800">
+          <span class="text-green-600">Additional Participant ${newId}</span>
+        </h2>
+        <button type="button" onclick="removeParticipant(this)" class="text-red-500 hover:text-red-700 text-sm">
+          Remove
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+          <input type="text" name="participant_${newId}_full_name"
+                 placeholder="John Doe" required
+                 class="form-input w-full">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Age</label>
+          <input type="number" name="participant_${newId}_age"
+                 placeholder="Optional"
+                 class="form-input w-full">
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Special Requirements</label>
+          <textarea name="participant_${newId}_notes"
+                    placeholder="Dietary restrictions, mobility needs, etc."
+                    class="form-input w-full" rows="2"></textarea>
+        </div>
+      </div>
+    `;
+
+    container.appendChild(newCard);
+    participantCount++;
+
+    // Update the request session
+    fetch("{% url 'update_participant_count' %}", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value
+      },
+      body: JSON.stringify({ count: participantCount })
+    })
+    .then(response => {
+      if (!response.ok) {
+        console.error('Error updating participant count');
+      }
+    });
+
+    // Update all counters
+    updateBookingInfo();
+    renumberParticipants();
+
+    // Scroll to the new participant card
+    newCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function removeParticipant(button) {
+    const card = button.closest('.participant-card');
+    if (card) {
+      card.classList.add('opacity-0', 'translate-x-4');
+      setTimeout(() => {
+        card.remove();
+        participantCount--;
+
+        // update the request session
+        fetch("{% url 'update_participant_count' %}", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value
+          },
+          body: JSON.stringify({ count: participantCount })
+        })
+        .then(response => {
+          if (!response.ok) {
+            console.error('Error updating participant count');
+          }
+        });
+
+        // Update all counters
+        updateBookingInfo();
+        renumberParticipants();
+      }, 200);
+    }
+  }
+
+  function renumberParticipants() {
+    const cards = document.querySelectorAll('.participant-card');
+    let counter = 1;
+
+    cards.forEach(card => {
+      const title = card.querySelector('h2 span');
+      // Update the title for visual display
+      if (title) {
+        title.textContent = `Additional Participant ${counter}`;
+      }
+
+      // Update the 'name' attribute of form fields to keep them sequential
+      card.querySelectorAll('input, textarea').forEach(input => {
+        const originalName = input.name;
+        if (originalName) {
+          const baseName = originalName.replace(/participant_\d+_(.*)/, '$1');
+          input.name = `participant_${counter}_${baseName}`;
+        }
+      });
+      counter++;
+    });
+    // Reset nextParticipantId to ensure it's always one greater than the last renumbered participant
+    nextParticipantId = counter;
+  }
+
+  function payWithPaystack(event) {
+    event.preventDefault();
+    const form = document.getElementById('payment-form');
+    console.log('Form submitted:', form);
+    const email = form.querySelector('input[name="email"]').value;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    submitBtn.disabled = true; // Disable the button to prevent multiple clicks
+    submitBtn.innerHTML = 'Processing... <svg class="animate-spin h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+    submitBtn.classList.add('cursor-not-allowed', 'opacity-50');
+
+    function uniqueReferenceWithEmail(email) {
+      const timestamp = new Date().getTime();
+      return `P_${timestamp}`;
+    }
+
+    const handler = new PaystackPop()
+
+    handler.newTransaction({
+      key: '{{ paystack_key }}', // Replace with your actual public key from Django settings or context
+      email: email,
+      amount: parseFloat("{{ total_price }}") * 100, // Convert to kobo (Ghana Cedis Pesewas)
+      currency: 'GHS', // Set currency explicitly
+      ref: uniqueReferenceWithEmail(email),
+      onClose: function() {
+        console.log('Payment window closed');
+        // You might want to show a message to the user or redirect them
+      },
+      callback: function(response) {
+        console.log('Payment successful! Reference: ' + response.reference);
+
+        // Here you can handle the successful payment, e.g., save booking details
+        // Redirect to confirmation page or show success message
+        fetch("{% url 'booking_payment' %}", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value
+          },
+          body: JSON.stringify({
+            reference: response.reference,
+            amount: parseFloat("{{ total_price }}"),
+            paymentSuccess: true,
+          })
+        })
+        .then(response => {
+          if (response.ok) {
+            console.log(response.url, response)
+            submitBtn.disabled = false; // Re-enable the button
+            submitBtn.innerHTML = 'Pay with Paystack →'; // Reset button text
+            submitBtn.classList.remove('cursor-not-allowed', 'opacity-50');
+            window.location.href = `${response.url}`; // Redirect to confirmation page
+          } else {
+            alert('Payment successful but failed to save booking. Please contact support.');
+          }
+        })
+        .catch(error => {
+          console.error('Error saving booking:', error);
+          alert('Payment successful but failed to save booking. Please contact support.');
+        });
+      }
+    });
+
+    handler.open(); // Open the Paystack payment modal
+  }
+
+  // Initialize everything when page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    // Only call updateBookingInfo if we are on the 'participants' step
+    "{% if step == 'participants' %}"
+      updateBookingInfo();
+    "{% endif %}"
+
+    // Highlight selected payment method (This part seems to be for a different payment method selection, not directly related to Paystack modal)
+    document.querySelectorAll('.payment-method').forEach(method => {
+      method.addEventListener('click', function() {
+        document.querySelectorAll('.payment-method').forEach(m => {
+          m.classList.remove('border-green-400', 'bg-green-50');
+        });
+        this.classList.add('border-green-400', 'bg-green-50');
+      });
+    });
+  });
+</script>
+
+<style>
+  .participant-card {
+    transition: all 0.2s ease;
+  }
+  .form-input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .form-input:focus {
+    border-color: #22c55e;
+    box-shadow: 0 0 0 2px #22c55e33;
+  }
+  .btn-primary {
+    display: inline-flex;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.375rem;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #fff;
+    background-color: #16a34a;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  .btn-primary:hover {
+    background-color: #15803d;
+  }
+  .btn-primary:focus {
+    outline: 2px solid #22c55e;
+    outline-offset: 2px;
+  }
+  .payment-method {
+    transition: all 0.2s ease;
+  }
+</style>
+{% endblock %}

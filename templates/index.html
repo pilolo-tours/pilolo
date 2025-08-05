@@ -1,0 +1,237 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Pilolo Tours - Discover Ghana by Bicycle{% endblock %}</title>
+  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  <link rel="stylesheet" href="{% static 'css/output.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-900 font-sans">
+
+  <!-- Navigation -->
+  <nav class="bg-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <!-- Logo/Brand -->
+        <div class="flex-shrink-0 flex items-center">
+          <a href="{% url 'home' %}" class="text-2xl font-bold text-ghana-green flex items-center">
+            <span class="mr-2">🚴‍♂️</span>
+            <span class="hidden sm:inline">Pilolo Tours</span>
+          </a>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="{% url 'tours_list' %}" class="text-gray-700 hover:text-ghana-green transition-colors duration-300 font-medium">Tours</a>
+          
+          {% if user.is_authenticated %}
+            <!-- User Profile Dropdown -->
+            <div class="relative">
+              <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none cursor-pointer">
+                <div class="w-8 h-8 rounded-full bg-ghana-green flex items-center justify-center text-white">
+                  {% if user.first_name %}
+                    {{ user.first_name|first|upper }}
+                  {% else %}
+                    <i class="fas fa-user"></i>
+                  {% endif %}
+                </div>
+                <span class="text-gray-600">Hi, {{ user.first_name|default:user.username }}</span>
+                <i class="fas fa-chevron-down text-xs text-gray-500 transition-transform duration-200"></i>
+              </button>
+              
+              <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+                <a href="{% url 'my_bookings' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  <i class="fas fa-calendar-alt mr-2"></i> My Bookings
+                </a>
+                <a href="{% url 'account_change_password' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  <i class="fas fa-key mr-2"></i> Change Password
+                </a>
+                <div class="border-t border-gray-200"></div>
+                <a href="{% url 'account_logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                </a>
+              </div>
+            </div>
+          {% else %}
+            <a href="{% url 'account_login' %}" class="text-gray-700 hover:text-ghana-green transition-colors">Login</a>
+            <a href="{% url 'account_signup' %}" class="btn-primary">Sign Up</a>
+          {% endif %}
+        </div>
+
+        <!-- Mobile menu button -->
+        <div class="md:hidden flex items-center">
+          <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-ghana-green focus:outline-none">
+            <span class="sr-only">Open main menu</span>
+            <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile menu (hidden by default) -->
+    <div class="mobile-menu hidden md:hidden" id="mobile-menu">
+      <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+        <a href="{% url 'tours_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-ghana-green hover:bg-gray-50">Tours</a>
+        
+        {% if user.is_authenticated %}
+          <div class="pt-2 pb-3 space-y-1 border-t border-gray-200">
+            <a href="{% url 'my_bookings' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-ghana-green hover:bg-gray-50">
+              <i class="fas fa-calendar-alt mr-2"></i> My Bookings
+            </a>
+            <a href="{% url 'account_change_password' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-ghana-green hover:bg-gray-50">
+              <i class="fas fa-key mr-2"></i> Change Password
+            </a>
+            <a href="{% url 'account_logout' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-ghana-green hover:bg-gray-50">
+              <i class="fas fa-sign-out-alt mr-2"></i> Logout
+            </a>
+          </div>
+        {% else %}
+          <a href="{% url 'account_login' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-ghana-green hover:bg-gray-50">Login</a>
+          <a href="{% url 'account_signup' %}" class="block w-full text-center btn-primary mt-2">Sign Up</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <!-- Messages Container -->
+  {% if messages %}
+  <div id="message-container" class="fixed top-4 right-4 z-50 w-full max-w-sm">
+    {% for message in messages %}
+    <div class="relative border px-4 py-3 rounded shadow-lg mb-2 auto-dismiss
+      opacity-0 -translate-x-full transition-all duration-500 ease-out
+      {% if message.tags == "success" %}bg-green-100 border-green-400 text-green-700
+      {% elif message.tags == "warning" %}bg-yellow-100 border-yellow-400 text-yellow-700
+      {% elif message.tags == "error" %}bg-red-100 border-red-400 text-red-700
+      {% else %}bg-blue-100 border-blue-400 text-blue-700
+      {% endif %}"
+      role="alert">
+      <span class="block sm:inline">{{ message }}</span>
+      <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
+        <svg class="fill-current h-6 w-6" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" onclick="this.parentElement.parentElement.style.display='none';">
+          <title>Close</title>
+          <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.03a1.2 1.2 0 1 1-1.697-1.697l3.03-2.651-3.03-2.651a1.2 1.2 0 0 1 1.697-1.697l2.651 3.03 2.651-3.03a1.2 1.2 0 1 1 1.697 1.697l-3.03 2.651 3.03 2.651a1.2 1.2 0 0 1 0 1.697z"/>
+        </svg>
+      </span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Main Content -->
+  <main class="min-h-[calc(100vh-200px)]">
+    {% block content %}
+    {% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-ghana-green text-white">
+    <div class="max-w-7xl mx-auto px-4 py-12">
+      <div class="grid md:grid-cols-3 gap-8">
+        <div>
+          <h3 class="text-xl font-bold mb-4">🚴‍♂️ Pilolo Tours</h3>
+          <p class="text-green-100">Authentic bicycle experiences through Ghana's most captivating urban destinations.</p>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-4">Contact</h4>
+          <p class="text-green-100">📍 Movenpick Hotel, Accra</p>
+          <p class="text-green-100">📞 +233 XXX XXX XXX</p>
+          <p class="text-green-100">✉️ hello@pilolotours.com</p>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-4">Follow Us</h4>
+          <div class="flex space-x-4">
+            <a href="#" class="text-ghana-gold hover:text-yellow-300"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="text-ghana-gold hover:text-yellow-300"><i class="fab fa-facebook"></i></a>
+            <a href="#" class="text-ghana-gold hover:text-yellow-300"><i class="fab fa-twitter"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-green-700 mt-8 pt-8 text-center text-green-100">
+        <p>&copy; 2025 Pilolo Tours. Crafted with ❤️ in Ghana.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile menu toggle functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const mobileMenuButton = document.getElementById('mobile-menu-button');
+      const mobileMenu = document.getElementById('mobile-menu');
+      const menuIcons = mobileMenuButton.querySelectorAll('svg');
+      
+      // Toggle main mobile menu
+      mobileMenuButton.addEventListener('click', function() {
+        mobileMenu.classList.toggle('hidden');
+        menuIcons.forEach(icon => icon.classList.toggle('hidden'));
+      });
+      
+      // Desktop user dropdown
+      const userMenuButton = document.getElementById('user-menu-button');
+      const userDropdown = document.getElementById('user-dropdown');
+      
+      if (userMenuButton && userDropdown) {
+        userMenuButton.addEventListener('click', function() {
+          userDropdown.classList.toggle('hidden');
+          const chevron = this.querySelector('i.fa-chevron-down');
+          chevron.classList.toggle('transform');
+          chevron.classList.toggle('rotate-180');
+        });
+        
+        // Close when clicking outside
+        document.addEventListener('click', function(event) {
+          if (!userMenuButton.contains(event.target)) {
+            userDropdown.classList.add('hidden');
+            const chevron = userMenuButton.querySelector('i.fa-chevron-down');
+            chevron.classList.remove('transform', 'rotate-180');
+          }
+        });
+      }
+      
+      // Close menus when clicking outside
+      document.addEventListener('click', function(event) {
+        if (!mobileMenuButton.contains(event.target) && !mobileMenu.contains(event.target)) {
+          mobileMenu.classList.add('hidden');
+          menuIcons[0].classList.remove('hidden');
+          menuIcons[1].classList.add('hidden');
+        }
+      });
+    });
+
+    // Messages auto-dismiss
+    document.addEventListener('DOMContentLoaded', () => {
+      const messages = document.querySelectorAll('.auto-dismiss');
+
+      messages.forEach(message => {
+        setTimeout(() => {
+          message.classList.remove('opacity-0', '-translate-x-full');
+          message.classList.add('opacity-100', 'translate-x-0');
+        }, 50);
+
+        setTimeout(() => {
+          message.style.opacity = '0';
+          message.style.transform = 'translateX(100%)';
+          message.addEventListener('transitionend', () => {
+            message.remove();
+          });
+        }, 5000);
+      });
+    });
+  </script>
+</body>
+</html>

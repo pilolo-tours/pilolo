@@ -1,0 +1,54 @@
+
+<div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+  <div class="text-center">
+    <div class="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-green-100">
+      <svg class="h-12 w-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+      </svg>
+    </div>
+    <h1 class="mt-6 text-3xl font-bold text-gray-900">Booking Confirmed!</h1>
+    <p class="mt-4 text-lg text-gray-600">
+      Thank you for booking {{ booking.tour.name }} on {{ booking.schedule.date|date:"F j, Y" }}.
+    </p>
+    
+    <div class="mt-10 bg-white shadow rounded-lg overflow-hidden max-w-md mx-auto">
+      <div class="px-6 py-5">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Booking Details</h2>
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span class="text-gray-600">Reference:</span>
+            <span class="font-medium">{{ booking.reference }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Date:</span>
+            <span>{{ booking.schedule.date|date:"F j, Y" }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Time:</span>
+            <span>{{ booking.schedule.start_time|time:"H:i" }} - {{ booking.schedule.end_time|time:"H:i" }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Participants:</span>
+            <span>{{ booking.participant_count }}</span>
+          </div>
+          <div class="flex justify-between border-t border-gray-200 pt-3 mt-3">
+            <span class="text-gray-600 font-medium">Total Paid:</span>
+            <span class="font-medium">GHS {{ booking.total_price }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="mt-10 space-y-4">
+      <p class="text-gray-600">We've sent a confirmation email to {{ booking.email }}.</p>
+      <div class="flex flex-col sm:flex-row justify-center gap-4 mt-6">
+        <a href="{% url 'booking_details' booking.id %}" class="btn-primary inline-flex items-center px-6 py-3 text-base">
+          View My Bookings
+        </a>
+        <a href="{% url 'home' %}" class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50">
+          Back to Home
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

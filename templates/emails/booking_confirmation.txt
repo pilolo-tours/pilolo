@@ -1,0 +1,26 @@
+Hi {{ user.first_name|default:user.username }},
+
+Thank you for booking with us! Here are your booking details:
+
+Tour: {{ tour.name }}
+Date: {{ schedule.date|date:"F j, Y" }}
+Time: {{ schedule.start_time|time:"H:i" }} - {{ schedule.end_time|time:"H:i" }}
+
+Participants:
+{% for participant in participants %}
+- {{ participant.full_name }}{% if participant.age %} (Age: {{ participant.age }}){% endif %}
+{% empty %}
+  No participants added.
+
+{% endfor %}
+
+Total Price: GHS {{ total_price }}
+
+Special Requirements: {{ booking.special_requirements|default:"None" }}
+
+You can view your booking details at: http://{{ site_name }}{% url 'booking_details' booking.id %}
+
+If you have any questions, please contact our support team.
+
+Best regards,
+The Pilolo Tours Team

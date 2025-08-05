@@ -1,5 +1,8 @@
 {
   "scripts": {
     "tailwind": "npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch"
+  },
+  "dependencies": {
+    "@paystack/inline-js": "^2.22.7"
   }
 }

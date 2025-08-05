@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Booking Confirmation</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { color: #2d3748; font-size: 24px; margin-bottom: 20px; }
+        .details { background: #f7fafc; padding: 20px; border-radius: 8px; }
+        .footer { margin-top: 20px; font-size: 14px; color: #718096; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="header">Booking Confirmation</h1>
+        
+        <p>Hi {{ user.first_name|default:user.username }},</p>
+        <p>Thank you for booking with us! Here are your booking details:</p>
+        
+        <div class="details">
+            <h2>{{ tour.name }}</h2>
+            <p><strong>Date:</strong> {{ schedule.date|date:"F j, Y" }}</p>
+            <p><strong>Time:</strong> {{ schedule.start_time|time:"H:i" }} - {{ schedule.end_time|time:"H:i" }}</p>
+            
+            <h3>Participants:</h3>
+            <ul>
+                {% for participant in participants %}
+                <li>{{ participant.full_name }}{% if participant.age %} (Age: {{ participant.age }}){% endif %}</li>
+
+                {% empty %}
+                <li>No participants added.</li>
+                {% endfor %}
+            </ul>
+            
+            <p><strong>Total Price:</strong> GHS {{ total_price }}</p>
+            <p><strong>Special Requirements:</strong> {{ booking.special_requirements|default:"None" }}</p>
+        </div>
+        
+        <p>You can view your booking details at: <a href="http://{{ site_name }}{% url 'booking_details' booking.id %}">View Booking</a></p>
+        
+        <div class="footer">
+            <p>If you have any questions, please contact our support team.</p>
+            <p>Best regards,<br>The Pilolo Tours Team</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -3,91 +3,209 @@
 {% block title %}{{ tour.name }} - Pilolo Tours{% endblock %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto px-4 py-8">
-    <!-- Tour Header -->
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Hero Section -->
+    <div class="relative rounded-2xl overflow-hidden mb-10">
         {% if tour.image %}
-            <img src="{{ tour.image }}" alt="{{ tour.name }}" class="w-full h-80 object-cover">
+            <img src="{{ tour.image }}" alt="{{ tour.name }}" class="w-full h-96 object-cover">
         {% else %}
-            <div class="w-full h-80 bg-gradient-to-r from-ghana-green to-green-500 flex items-center justify-center">
-                <span class="text-8xl">🚴‍♂️</span>
+            <div class="w-full h-96 bg-gradient-to-r from-ghana-green to-green-600 flex items-center justify-center">
+                <span class="text-9xl">🚴‍♂️</span>
             </div>
         {% endif %}
         
-        <div class="p-8">
-            <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ tour.name }}</h1>
-            <div class="flex items-center justify-between mb-6">
-                <div class="flex items-center space-x-6 text-gray-600">
-                    <span class="flex items-center"><span class="mr-2">⏱️</span>{{ tour.duration }}</span>
-                    <span class="flex items-center"><span class="mr-2">👥</span>Max {{ tour.max_participants }} people</span>
-                    <span class="flex items-center"><span class="mr-2">📍</span>{{ tour.meeting_point }}</span>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 right-0 p-8">
+            <div class="max-w-3xl mx-auto">
+                <h1 class="text-3xl lg:text-5xl font-bold text-white mb-4">{{ tour.name }}</h1>
+                <div class="flex flex-wrap items-center gap-4 text-white">
+                    <span class="flex items-center bg-black/30 px-3 py-1 rounded-full">
+                        <span class="mr-2">⏱️</span>{{ tour.duration }} hours
+                    </span>
+                    <span class="flex items-center bg-black/30 px-3 py-1 rounded-full">
+                        <span class="mr-2">👥</span>Max {{ tour.max_participants }}
+                    </span>
+                    <span class="flex items-center bg-black/30 px-3 py-1 rounded-full">
+                        <span class="mr-2">📍</span>{{ tour.meeting_point }}
+                    </span>
                 </div>
-                <div class="text-3xl font-bold text-ghana-green">GHS {{ tour.price }}</div>
             </div>
-            <p class="text-gray-700 text-lg leading-relaxed">{{ tour.description|linebreaks }}</p>
         </div>
     </div>
 
     <div class="grid lg:grid-cols-3 gap-8">
-        <!-- Tour Information -->
+        <!-- Main Content -->
         <div class="lg:col-span-2 space-y-8">
+            <!-- Price & Quick Facts -->
+            <div class="bg-white rounded-2xl shadow-md p-6">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="flex justify-between items-baseline">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900 mb-2">GHS {{ tour.price }}</h2>
+                            <p class="text-gray-600">Per person</p>
+                        </div>
+                        <button class="mt-4 lg:hidden bg-ghana-green text-white px-6 py-2 rounded-full hover:bg-green-600 transition cursor-pointer" onclick="document.getElementById('schedule').scrollIntoView({ behavior: 'smooth' })">
+                            Book Now
+                        </button>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                            Free cancellation
+                        </span>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                            Instant confirmation
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tour Description -->
+            <div class="bg-white rounded-2xl shadow-md p-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">About this tour</h2>
+                <div class="prose max-w-none text-gray-700">
+                    {{ tour.description|linebreaks }}
+                </div>
+            </div>
+
             <!-- Highlights -->
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">Highlights</h2>
-                <div class="prose text-gray-700">
-                    {{ tour.highlights|linebreaks }}
+            <div class="bg-white rounded-2xl shadow-md p-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Tour Highlights</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    {% for highlight in tour.highlights_as_list %}
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 mt-1">
+                            <div class="h-6 w-6 rounded-full bg-ghana-green flex items-center justify-center">
+                                <svg class="h-4 w-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-gray-800">{{ highlight }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
 
-            <!-- What's Included -->
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">What's Included</h2>
-                <div class="prose text-gray-700">
-                    {{ tour.what_included|linebreaks }}
+            <!-- Details Sections -->
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- What's Included -->
+                <div class="bg-white rounded-2xl shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">What's Included</h3>
+                    <ul class="space-y-3">
+                        {% for item in tour.what_included_as_list %}
+                        <li class="flex items-start">
+                            <svg class="h-5 w-5 text-ghana-green mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="text-gray-700">{{ item }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
                 </div>
-            </div>
 
-            <!-- What to Bring -->
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">What to Bring</h2>
-                <div class="prose text-gray-700">
-                    {{ tour.what_to_bring|linebreaks }}
+                <!-- What to Bring -->
+                <div class="bg-white rounded-2xl shadow-md p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">What to Bring</h3>
+                    <ul class="space-y-3">
+                        {% for item in tour.what_to_bring_as_list %}
+                        <li class="flex items-start">
+                            <svg class="h-5 w-5 text-gray-400 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                            <span class="text-gray-700">{{ item }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
                 </div>
             </div>
         </div>
 
-        <!-- Booking Section -->
-        <div class="lg:col-span-1">
-            <div class="bg-white rounded-xl shadow-lg p-6 sticky top-24">
-                <h3 class="text-xl font-bold text-gray-900 mb-4">Book Your Adventure</h3>
+        <!-- Booking Sidebar -->
+        <div class="lg:col-span-1" id='schedule'>
+            <div class="bg-white rounded-2xl shadow-lg p-6 sticky top-18">
+                <h3 class="text-2xl font-bold text-gray-900 mb-6">Available Dates</h3>
                 
+                {% if schedules %}
                 <div class="space-y-4 mb-6">
                     {% for schedule in schedules %}
-                        <div class="border border-gray-200 rounded-lg p-4 hover:border-ghana-green transition-colors">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <p class="font-semibold text-gray-900">{{ schedule.get_day_display }}</p>
-                                    <p class="text-gray-600">{{ schedule.start_time }} - {{ schedule.end_time }}</p>
-                                </div>
-                                <button 
-                                    hx-post="{% url 'booking_form' %}"
-                                    hx-vals='{"schedule_id": "{{ schedule.id }}"}'
-                                    hx-target="#booking-modal"
-                                    hx-swap="innerHTML"
-                                    class="btn-primary text-sm">
-                                    Book Now
-                                </button>
+                    <div class="border border-gray-200 rounded-xl p-4 hover:border-ghana-green transition-colors duration-200">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <div>
+                                <p class="font-semibold text-gray-900">{{ schedule.get_day_display }}</p>
+                                <p class="text-gray-600 text-sm">{{ schedule.start_time|time:"g:i A" }} - {{ schedule.end_time|time:"g:i A" }}</p>
+                                <p class="text-gray-500 text-xs mt-1">{{ schedule.date|date:"M j, Y" }}</p>
                             </div>
+                            {% if schedule.remaining_slots > 0 %}
+                            <div class="text-ghana-green font-semibold flex flex-col">
+                                <div class="">
+                                    <span class="text-lg">{{ schedule.remaining_slots }}</span> slot{{ schedule.remaining_slots|pluralize }}
+                                </div>
+                                <a href="{% url 'booking_start' schedule.id %}" class="btn-primary whitespace-nowrap px-4 py-2 text-sm flex-shrink-0">
+                                    Book Now
+                                </a>
+                            </div>
+                            {% else %}
+                            <!-- <div class="text-red-500 font-semibold">
+                                Fully Booked
+                            </div> -->
+                            <div class="text-sm text-gray-500">
+                                <span class="inline-flex items-center px-2 py-1 rounded-full bg-red-100 text-red-800">
+                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                    </svg>
+                                    No slots available
+                                </span>
+                            </div>
+                            {% endif %}
                         </div>
-                    {% empty %}
-                        <p class="text-gray-500">No schedules available at the moment.</p>
+                    </div>
                     {% endfor %}
                 </div>
+                {% else %}
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-yellow-700">
+                                No schedules available at the moment. Please check back later.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
 
-                <div class="text-sm text-gray-500">
-                    <p class="mb-2">✅ Free cancellation up to 24 hours before</p>
-                    <p class="mb-2">✅ Instant confirmation</p>
-                    <p>✅ Small group experience</p>
+                <div class="space-y-3 text-sm text-gray-600 border-t border-gray-200 pt-4">
+                    <div class="flex items-start">
+                        <svg class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                        <span>Free cancellation up to 24 hours before</span>
+                    </div>
+                    <div class="flex items-start">
+                        <svg class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                        <span>Small group experience (max {{ tour.max_participants }})</span>
+                    </div>
+                    <div class="flex items-start">
+                        <svg class="h-5 w-5 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                        </svg>
+                        <span>Meeting point: {{ tour.meeting_point }}</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -95,43 +213,18 @@
 </div>
 
 <!-- Booking Modal -->
-<div id="booking-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-    <div id="modal-loading-spinner" class="text-white flex flex-col items-center gap-4">
-        <svg class="animate-spin h-10 w-10 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-        </svg>
-        <p class="text-sm uppercase tracking-wide">Loading booking form...</p>
+<div id="booking-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4 overflow-y-auto">
+    <div class="relative w-full max-w-2xl">
+        <div id="modal-loading-spinner" class="absolute inset-0 bg-white rounded-xl flex flex-col items-center justify-center gap-4">
+            <svg class="animate-spin h-12 w-12 text-ghana-green" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+            </svg>
+            <p class="text-gray-700 font-medium">Preparing your booking...</p>
+        </div>
+        <div id="modal-content" class="bg-white rounded-xl overflow-hidden shadow-xl transform transition-all"></div>
     </div>
 </div>
 
 
-<script>
-   document.addEventListener('htmx:configRequest', function(e) {
-        // Show modal and spinner before HTMX request is sent
-        const modal = document.getElementById('booking-modal');
-        if (modal) {
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            document.getElementById('modal-loading-spinner').style.display = 'flex';
-        }
-    });
-
-    document.addEventListener('htmx:afterSwap', function(e) {
-        if (e.detail.target.id === 'booking-modal') {
-            // Hide spinner after content is swapped in
-            const spinner = document.getElementById('modal-loading-spinner');
-            if (spinner) spinner.style.display = 'none';
-        }
-    });
-
-    document.getElementById('booking-modal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            this.classList.add('hidden');
-            this.classList.remove('flex');
-            const spinner = document.getElementById('modal-loading-spinner');
-            if (spinner) spinner.style.display = 'none';
-        }
-    });
-</script>
 {% endblock %}

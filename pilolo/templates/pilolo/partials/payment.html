@@ -1,0 +1,71 @@
+ <div class="space-y-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Payment Information</h2>
+
+            <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-6">
+              <h3 class="text-lg font-semibold text-gray-800 mb-3">Booking Summary</h3>
+              <div class="space-y-2">
+                <p class="text-gray-700"><strong>Tour:</strong> {{ tour.name }}</p>
+                <p class="text-gray-700"><strong>Date:</strong> {{ schedule.date|date:"F j, Y" }}</p>
+                <p class="text-gray-700"><strong>Time:</strong> {{ schedule.start_time|time:"H:i" }} - {{ schedule.end_time|time:"H:i" }}</p>
+                <p class="text-gray-700"><strong>Participants:</strong> 
+                  {% if participant_count > 0 %}
+                    {{ participant_count }}
+                  {% else %}
+                    0 (just you)
+                  {% endif %}
+                </p>
+                <p class="text-gray-700"><strong>Total Price:</strong> GHS {{ total_price }}</p>
+              </div>
+            </div>
+
+            <form id="payment-form" onsubmit="payWithPaystack(event)">
+              {% csrf_token %}
+              <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+                <div class="flex">
+                  <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <div class="ml-3">
+                    <p class="text-sm text-blue-700">
+                      You will be redirected to Paystack to complete your payment securely.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
+                <input type="email" name="email" required disabled
+                       placeholder="Your email for payment receipt"
+                       class="form-input w-full disabled:bg-gray-100 cursor-not-allowed" value="{{ request.user.email }}">
+                       <p class="text-sm text-gray-500 mt-1">We'll send a confirmation email to this address.</p>
+              </div>
+
+              <div class="mt-6 mb-4">
+                <label class="flex items-start">
+                  <div class="flex items-center h-5">
+                    <input type="checkbox" name="terms" required class="focus:ring-green-500 h-4 w-4 text-green-600 border-gray-300 rounded">
+                  </div>
+                  <div class="ml-3 text-sm">
+                    <p class="text-gray-500">I agree to the <a href="#" class="text-green-600 hover:text-green-500">Terms and Conditions</a> and <a href="#" class="text-green-600 hover:text-green-500">Privacy Policy</a></p>
+                  </div>
+                </label>
+              </div>
+
+              <div class="flex justify-between pt-6 border-t border-gray-200">
+                <a href="{% url 'booking_participants' %}"
+                        class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                  ← Back to Participants
+                </a>
+                <button type="submit"
+                        class="btn-primary inline-flex items-center px-4 py-2">
+                  Pay with Paystack →
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>

@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load socialaccount %}
+{% load i18n %} {# Required for allauth templates if you use trans #}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div id="main-card" class="relative max-w-lg w-full space-y-10 bg-white p-10 sm:p-12 rounded-3xl shadow-2xl border border-gray-100 transform translate-y-4 opacity-0 transition-all duration-700 ease-out">
+        
+        <!-- Header Section -->
+        <div class="text-center">
+            <h2 class="mt-2 text-3xl font-extrabold text-gray-900 leading-tight">
+                Confirm Your Account
+            </h2>
+            <p class="mt-3 text-lg text-gray-600 flex items-center justify-center space-x-2">
+                <span>Signing in via</span>
+                <!-- Google Logo SVG -->
+                <svg class="w-6 h-6 -mt-1" viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M533.5 272.3c0-18.9-1.6-37.4-4.7-55.3H272.1v104.8h147c-6.1 33.7-25.7 63.5-55.9 83.3l-.1.9 85.3 66.2.6.8c52.9-48.8 83.8-120.9 83.8-200.7z" fill="#4285F4"/>
+                    <path d="M272.1 544.3c73.4 0 135.3-24.1 180.4-65.7l-85.2-66.2c-24.4 16.3-55.9 25.9-95.2 25.9-73.4 0-135.3-49.1-157.8-115.3l-1.3-.8-83.3 64.5c44.7 88.6 139.7 148.6 242.4 148.6z" fill="#34A853"/>
+                    <path d="M114.3 328.9c-5.9-16.3-9.2-33.7-9.2-55.3s3.3-39 9.2-55.3l-.1-.7-83.1-64.4c-15.7 31.5-24.8 66.8-24.8 120.4s9.1 88.9 24.8 120.4l83.1-64.4.1-.7z" fill="#FBBC05"/>
+                    <path d="M272.1 106.6c41.6 0 78.6 14.3 107.5 41.9l76.8-76.8C407.2 24.1 345.3 0 272.1 0 169.4 0 74.4 59.9 29.7 148.5l83.1 64.4c22.4-66.2 84.3-115.3 159.3-115.3z" fill="#EA4335"/>
+                </svg>
+                <span class="font-bold text-gray-800">Google</span>
+            </p>
+        </div>
+
+        <!-- Confirmation Message -->
+        <div class="text-center bg-blue-50 border border-blue-200 text-blue-800 px-8 py-6 rounded-xl shadow-inner">
+            <p class="text-xl font-semibold mb-2">
+                You're almost there!
+            </p>
+            <p class="text-base text-blue-700">
+                Please confirm to link your Google account and continue to our platform.
+            </p>
+        </div>
+
+        <!-- Form for Confirmation -->
+        <form method="post" class="mt-6 space-y-6" id="confirm-form">
+            {% csrf_token %}
+            {# If allauth requires additional fields for social signup, they would go here #}
+            {# For example: {% if form %}{{ form.as_p }}{% endif %} #}
+            
+            <button type="submit" id="continue-button" class="group relative w-full flex justify-center items-center py-3 px-4 border border-transparent text-lg font-medium rounded-xl text-white bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-300 ease-in-out shadow-md hover:shadow-lg cursor-pointer">
+                <span id="button-text">Continue</span>
+                <svg id="loading-spinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </button>
+        </form>
+
+        <!-- Footer Navigation / Alternative Options -->
+        <div class="text-center text-sm text-gray-500 mt-8 space-y-2">
+            <p>
+                Not your account?
+                <a href="{% url 'account_login' %}" class="font-medium text-primary-600 hover:text-primary-700 transition-colors duration-200">
+                    Choose another option
+                </a>
+            </p>
+            <p>
+                Having trouble?
+                <a href="#" class="font-medium text-primary-600 hover:text-primary-700 transition-colors duration-200">
+                    Contact support
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const mainCard = document.getElementById('main-card');
+        const continueButton = document.getElementById('continue-button');
+        const buttonText = document.getElementById('button-text');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const confirmForm = document.getElementById('confirm-form');
+
+        // Initial card entry animation
+        setTimeout(() => {
+            mainCard.classList.remove('translate-y-4', 'opacity-0');
+            mainCard.classList.add('translate-y-0', 'opacity-100');
+        }, 100); // Small delay to ensure CSS is applied before transition
+
+        // Handle button loading state on form submission
+        confirmForm.addEventListener('submit', () => {
+            continueButton.disabled = true;
+            buttonText.textContent = 'Processing...';
+            loadingSpinner.classList.remove('hidden');
+        });
+
+        // Optional: If form submission fails via AJAX (e.g., if you add client-side validation later)
+        // You would need to re-enable the button and hide the spinner.
+        // For a standard form POST, the page will reload on success/failure,
+        // so this specific reset logic is mostly for AJAX submissions.
+    });
+</script>
+{% endblock %}

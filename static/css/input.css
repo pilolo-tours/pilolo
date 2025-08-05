@@ -2,11 +2,15 @@
 
 @theme {
 
+
     --color-ghana-red: #CE1126;
     --color-ghana-gold: #FCD116;
     --color-ghana-green: #006B3F;
+    
                       
 }
+
+
     
 .form-input {
     @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-ghana-green focus:border-transparent transition-all;
@@ -17,4 +21,20 @@
 .btn-secondary {
     @apply bg-ghana-gold text-ghana-green px-6 py-2 rounded-lg hover:bg-yellow-300 transition-all duration-200 font-medium;
 }
+
+.status-badge {
+    @apply px-2.5 py-1 rounded-md text-xs font-medium;
+  }
+  .status-badge.confirmed {
+    @apply bg-green-50 text-green-700 border border-green-100;
+  }
+  .status-badge.pending {
+    @apply bg-yellow-50 text-yellow-700 border border-yellow-100;
+  }
+  .status-badge.cancelled {
+    @apply bg-red-50 text-red-700 border border-red-100;
+  }
+  .status-badge.completed {
+    @apply bg-blue-50 text-blue-700 border border-blue-100;
+  }
     
