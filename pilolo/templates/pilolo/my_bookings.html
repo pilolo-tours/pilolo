@@ -64,10 +64,10 @@
 
     <!-- Content Area -->
     <div id="bookings-content">
-      <div id="loading-indicator" class="justify-center my-8 hidden transition-opacity duration-300 h-64 mt-4">
+      <div id="loading-indicator" class="justify-center items-center my-8 hidden transition-opacity duration-300 h-64 mt-4">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
       </div>
-      <!-- {% include 'pilolo/partials/_bookings_list.html' %} -->
+      
     </div>
   </div>
 </div>
@@ -82,6 +82,26 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Initialize HTMX
   htmx.config.useTemplateFragments = true;
+
+  // Load initial bookings
+  loadBookings();
+
+  // get all bookings at first load
+  function loadBookings() {
+    // Show loading indicator
+    loadingIndicator.classList.remove('hidden');
+    loadingIndicator.classList.add('flex');
+
+    htmx.ajax('GET', '{% url "my_bookings" %}', {
+      target: '#bookings-content',
+      swap: 'innerHTML',
+      onSuccess: function() {
+        // Hide loading indicator after initial load
+        loadingIndicator.classList.add('hidden');
+        loadingIndicator.classList.remove('flex');
+      }
+    });
+  }
   
   // Tab click handler
   tabs.forEach(tab => {
