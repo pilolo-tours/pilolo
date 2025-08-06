@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 def home(request):
-    tours = Tour.objects.all()
+    tours = Tour.objects.all()[:5]  # Limit to 5 tours for the home page
     logger.info(f"Loaded {tours.count()} tours for home page")
     if not tours:
         messages.info(request, "No tours available at the moment. Please check back later.")
@@ -291,7 +291,7 @@ def my_bookings(request):
     # Apply status filter if not 'all'
     if status == 'upcoming':
         bookings_list = bookings_list.filter(status__in=['confirmed', 'pending'], tour_date__gte=timezone.now().date())
-    elif status == 'completed':
+    elif status == 'confirmed':
         bookings_list = bookings_list.filter(status='confirmed')
         print(f"Filtered bookings for completed status: {bookings_list.count()}")
     elif status == 'cancelled':
@@ -304,7 +304,7 @@ def my_bookings(request):
 
     if request.headers.get('HX-Request'):
         # Return just the bookings list partial for HTMX requests
-        return render(request, 'pilolo/partials/_bookings_list.html', {
+        return render(request, 'pilolo/partials/bookings_list.html', {
             'bookings': page_obj,
             'is_paginated': page_obj.has_other_pages(),
             'page_obj': page_obj,
@@ -323,7 +323,6 @@ def update_participant_count(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         count = data.get('count', 0)
-        print("COUNT:", count)
         request.session['booking']['participants'] = count
         request.session.modified = True
 
